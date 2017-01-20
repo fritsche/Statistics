@@ -1,0 +1,44 @@
+libs/
+lib/
+tmp/
+
+resources/
+nbproject/
+target/
+nbactions.xml
+/teste/
+*.aux
+
+*.class
+*.tsv
+*.log
+#*.R
+*.Rhistory
+
+/experiments/
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+bin/
+.project
+.classpath
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+*~
+
+/nbproject/private/
+/target/
+
+screenlog.0
+/log/
+addjob.sh.o*
+
+*.fuse_*
