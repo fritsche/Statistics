@@ -29,7 +29,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>br.ufpr.inf.cbio.statistics.StatisticalTest</mainClass>
+                            <mainClass>br.ufpr.inf.cbio.statistics.StatisticalTests</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
