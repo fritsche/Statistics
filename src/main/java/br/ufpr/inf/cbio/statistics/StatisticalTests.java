@@ -39,6 +39,9 @@ public class StatisticalTests {
         isMinimization.put("HV", false);
         isMinimization.put("IGD", true);
         isMinimization.put("R2", true);
+        isMinimization.put("EP", true);
+        isMinimization.put("GD", true);
+        isMinimization.put("IGD+", true);
 
         data = new HashMap<String, HashMap<String, HashMap<String, double[]>>>();
         statisticalData = new HashMap<String, HashMap<String, HashMap<String, HashMap<String, Boolean>>>>();
@@ -55,7 +58,7 @@ public class StatisticalTests {
                 for (String algorithm : algorithmNameList) {
                     ArrayList<Double> d = new ArrayList<Double>();
                     FileInputStream fis = new FileInputStream(
-                            experimentBaseDirectory + "/" + algorithm + "/" + m + "/" + problem + "/" + indicator);
+                            experimentBaseDirectory + "/" + m + "/data/" + algorithm + "/" + problem + "/" + indicator);
                     InputStreamReader isr = new InputStreamReader(fis);
                     BufferedReader br = new BufferedReader(isr);
                     String aux = br.readLine();
@@ -209,7 +212,7 @@ public class StatisticalTests {
                 for (int m : mm) {
                     for (String problem : problemNameList) {
                         FileInputStream fis = new FileInputStream(
-                                experimentBaseDirectory + "/" + algorithm + "/" + m + "/" + problem + "/" + indicator);
+                                experimentBaseDirectory + "/" + m + "/data/" + algorithm + "/" + problem + "/" + indicator);
                         InputStreamReader isr = new InputStreamReader(fis);
                         BufferedReader br = new BufferedReader(isr);
                         String aux = br.readLine();
@@ -346,8 +349,8 @@ public class StatisticalTests {
 
             String Output = "";
             Output = Output + ("\\documentclass{article}\n" + "\\usepackage{graphicx}"
-                    + "\\usepackage{colortbl}\n" +
-                    "\\usepackage[table*]{xcolor}\n"
+                    + "\\usepackage{colortbl}\n"
+                    + "\\usepackage[table*]{xcolor}\n"
                     + "\\usepackage{multirow}\n"
                     + "\\usepackage{fixltx2e}\n"
                     + "\\usepackage{stfloats}\n"
@@ -432,7 +435,6 @@ public class StatisticalTests {
         // objective list
         // output directory
         // experiment name
-        
         LinkedList<String> arguments = new LinkedList<>(Arrays.asList(args));
 
         Iterator<String> iterator = arguments.iterator();
