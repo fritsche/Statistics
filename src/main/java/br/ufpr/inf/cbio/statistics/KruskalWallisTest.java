@@ -14,7 +14,7 @@ public class KruskalWallisTest {
 
 	public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir)
 			throws IOException, InterruptedException {
-		String script = "require(PMCMR)\n";
+		String script = "require(PMCMR)\noptions(\"width\"=10000)\n";
 		script += "ARRAY <- c(";
 		int size = 0;
 		for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
