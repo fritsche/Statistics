@@ -440,28 +440,37 @@ public class StatisticalTests {
         Iterator<String> iterator = arguments.iterator();
 
         String indicator = iterator.next();
+        System.out.println("Indicator: " + indicator);
 
         int numAlgs = Integer.parseInt(iterator.next());
+        System.out.println("numAlgs: " + numAlgs);
         List<String> algorithmNameList = new ArrayList<>(numAlgs);
         for (int i = 0; i < numAlgs; i++) {
             algorithmNameList.add(iterator.next());
+            System.out.println("\talgorithm: " + algorithmNameList.get(i));
         }
 
         List<String> problemNameList = new ArrayList<>();
         int numProbs = Integer.parseInt(iterator.next());
+        System.out.println("numProbs: " + numProbs);
         for (int i = 0; i < numProbs; i++) {
             problemNameList.add(iterator.next());
+            System.out.println("\tproblem: " + problemNameList.get(i));
         }
 
         int numObj = Integer.parseInt(iterator.next());
+        System.out.println("numObj: " + numObj);
         int objectives[] = new int[numObj];
         for (int i = 0; i < numObj; i++) {
             objectives[i] = (Integer.parseInt(iterator.next()));
+            System.out.println("\tobjectives: " + objectives[i]);
         }
 
         String outputDir = iterator.next();
+        System.out.println("outputDir: " + outputDir);
 
         String experimentName = iterator.next();
+        System.out.println("experimentName: " + experimentName);
 
         List<String> indicatorNameList = new ArrayList<>();
         indicatorNameList.add(indicator);
