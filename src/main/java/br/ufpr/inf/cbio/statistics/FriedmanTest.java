@@ -134,11 +134,12 @@ public class FriedmanTest {
         for (Map.Entry<String, HashMap<String, Double>> entry : matrix.entrySet()) {
             String key = entry.getKey();
             HashMap<String, Double> value = entry.getValue();
+            result.put(key, new HashMap<String, Boolean>());
             for (Map.Entry<String, Double> entry2 : value.entrySet()) {
                 String key2 = entry2.getKey();
                 double dvalue = entry2.getValue();
-                result.put(key, new HashMap<String, Boolean>());
-                if (dvalue < (1 - confidence)) {
+                
+                if (dvalue < 0.05) {
                     result.get(key).put(key2, true);
                 } else {
                     result.get(key).put(key2, false);
