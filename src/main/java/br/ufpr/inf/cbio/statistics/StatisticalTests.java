@@ -480,11 +480,12 @@ public class StatisticalTests {
 
             tests.generateStatisticalTests(indicator, problemNameList, algorithmNameList, outputDir, m,
                     experimentName);
-            tests.generateOverallStatisticalTest(indicator, objectives, problemNameList, algorithmNameList,
-                    outputDir, experimentName);
 
             tests.generateLatexTables(indicatorNameList, problemNameList, algorithmNameList, outputDir,
                     experimentName, m);
         }
+        
+        tests.generateOverallStatisticalTest(indicator, objectives, problemNameList, algorithmNameList,
+                    outputDir, experimentName);
     }
 }

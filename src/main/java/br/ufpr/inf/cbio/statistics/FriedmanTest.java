@@ -14,7 +14,6 @@ import java.io.BufferedReader;
 //
 //You should have received a copy of the GNU Lesser General Public License
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,17 +26,17 @@ import java.util.Scanner;
 /**
  *
  * @return matrix alg x alg a cell is true if there is statistical difference
- *         between the alg_column and the alg_line false otherwise
+ * between the alg_column and the alg_line false otherwise
  *
  */
 public class FriedmanTest {
 
-        public static double confidence = 0.99;
-    
-	public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir)
-			throws IOException, InterruptedException {
+    public static double confidence = 0.99;
 
-		String script = "require(pgirmess)\n";
+    public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir)
+            throws IOException, InterruptedException {
+
+        String script = "require(PMCMR)\noptions(\"width\"=10000)\n";
         script += "ARRAY <- c(";
         int size = 0;
         for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
@@ -61,7 +60,7 @@ public class FriedmanTest {
         script += "\n";
 
         script += "probs<-as.factor(rep(c(";
-        for (int i=0; i<size; ++i) {
+        for (int i = 0; i < size; ++i) {
             script += "\"" + i + "\",";
         }
         script = script.substring(0, script.lastIndexOf(","));
@@ -69,19 +68,13 @@ public class FriedmanTest {
         script += "\n";
 
         script += "result <- friedman.test(ARRAY,categs,probs)\n";
-        script += "m <- data.frame(result$statistic,result$p.value)\n";
-        script += "pos_teste <- friedmanmc(ARRAY,categs,probs)\n";
+        script += "print(result);\n";
+        script += "pos_teste<-posthoc.friedman.nemenyi.test(ARRAY, categs, probs, method='Tukey');\n";
         script += "print(pos_teste)\n";
-        script += "print(m)";
 
-        //File scriptFile = File.createTempFile("script", ".R");
-        //File outputFile = File.createTempFile("output", ".R");
-        // scriptFile.deleteOnExit();
-        // outputFile.deleteOnExit();
-        File scriptFile = new File("script.R");
-        scriptFile.createNewFile();
-        File outputFile = new File(outputDir+"/friedmanOutput.R");
-        outputFile.createNewFile();
+        StatisticalTests.checkDirectory(outputDir);
+        File scriptFile = new File(outputDir + "/friedmanscript.R");
+        File outputFile = new File(outputDir + "/friedmanoutput.R");
 
         try (FileWriter scriptWriter = new FileWriter(scriptFile)) {
             scriptWriter.append(script);
@@ -92,54 +85,69 @@ public class FriedmanTest {
 
         Process process = processBuilder.start();
         process.waitFor();
-        if (process.exitValue() != 0){
+        if (process.exitValue() != 0) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.err.println(line);
+            }
             throw new InterruptedException("R process failed! Check if R is installed");
         }
 
         ArrayList<Map.Entry<String, double[]>> entrySets = new ArrayList<>(values.entrySet());
 
         HashMap<String, HashMap<String, Boolean>> result = new HashMap<>();
+        HashMap<String, HashMap<String, Double>> matrix = new HashMap<>();
 
-        for (int i = 0; i < entrySets.size() - 1; i++) {
-            String entry1 = entrySets.get(i).getKey();
-            for (int j = i + 1; j < entrySets.size(); j++) {
-                String entry2 = entrySets.get(j).getKey();
+        int combinacoes = values.size();
+        ArrayList<String> lines = new ArrayList<String>();
+        Scanner scanner = new Scanner(outputFile);
+        while (scanner.hasNextLine()) {
+            lines.add(scanner.nextLine());
+        }
+        for (int i = lines.size() - combinacoes - 1; i < lines.size() - 2; i++) {
+            for (int j = 0; j < combinacoes - 1; j++) {
+                String l = lines.get(i).split("\\s+")[0];
+                String c = lines.get(lines.size() - combinacoes - 2).split("\\s+")[j + 1];
+                matrix.put(l, new HashMap<>());
+                matrix.put(c, new HashMap<>());
+            }
+        }
 
-                Scanner scanner = new Scanner(outputFile);
+        for (int i = lines.size() - combinacoes - 1; i < lines.size() - 2; i++) {
+            double[] splittedValue = new double[combinacoes];
 
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    // System.out.println(line);
-                    if (line.contains(entry1 + "-" + entry2)
-                            || line.contains(entry2 + "-" + entry1)) {
-                        HashMap<String, Boolean> entry1Map = result.get(entry1);
-                        if (entry1Map == null) {
-                            entry1Map = new HashMap<>();
-                            result.put(entry1, entry1Map);
-                        }
-                        HashMap<String, Boolean> entry2Map = result.get(entry2);
-                        if (entry2Map == null) {
-                            entry2Map = new HashMap<>();
-                            result.put(entry2, entry2Map);
-                        }
-                        if (line.contains("TRUE")) {
-                            entry1Map.put(entry2, true);
-                            entry2Map.put(entry1, true);
-                            break;
-                        } else if (line.contains("FALSE")) {
-                            entry1Map.put(entry2, false);
-                            entry2Map.put(entry1, false);
-                            break;
-                        }
-                    }
+            for (int j = 0; j < combinacoes - 1; j++) {
+
+                String part = lines.get(i).replace("<", "").split("\\s+")[j + 1];
+
+                if (part.compareTo("-") != 0) {
+
+                    String l = lines.get(i).split("\\s+")[0];
+                    String c = lines.get(lines.size() - combinacoes - 2).split("\\s+")[j + 1];
+                    matrix.get(l).put(c, Double.parseDouble(part));
+                    matrix.get(c).put(l, Double.parseDouble(part));
                 }
             }
         }
 
-        //scriptFile.delete();
-        //outputFile.delete();
+        for (Map.Entry<String, HashMap<String, Double>> entry : matrix.entrySet()) {
+            String key = entry.getKey();
+            HashMap<String, Double> value = entry.getValue();
+            for (Map.Entry<String, Double> entry2 : value.entrySet()) {
+                String key2 = entry2.getKey();
+                double dvalue = entry2.getValue();
+                result.put(key, new HashMap<String, Boolean>());
+                if (dvalue < (1 - confidence)) {
+                    result.get(key).put(key2, true);
+                } else {
+                    result.get(key).put(key2, false);
+                }
+            }
+        }
 
         return result;
+
     }
 
 }
