@@ -23,61 +23,94 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-/**
- *
- * @return matrix alg x alg a cell is true if there is statistical difference
- * between the alg_column and the alg_line false otherwise
- *
- */
 public class FriedmanTest {
 
     public static double confidence = 0.99;
 
-    public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir)
+    /**
+     *
+     * @param values
+     * @param outputDir
+     * @return matrix alg x alg a cell is true if there is statistical
+     * difference between the alg_column and the alg_line false otherwise
+     * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
+     *
+     */
+    public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir, boolean isMinimization)
             throws IOException, InterruptedException {
 
-        String script = "require(PMCMR)\noptions(\"width\"=10000)\n";
-        script += "ARRAY <- c(";
+        /**
+         * To install graph and Rgraphviz: #
+         * source("http://bioconductor.org/biocLite.R") #
+         * biocLite(c("graph","Rgraphviz"))
+         */
+        String script = "require(\"PMCMR\")\n"
+                + "options(\"width\"=10000)\n";
+        String data = "ARRAY <- c(";
         int size = 0;
         for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
             double[] keyValues = entrySet.getValue();
             size = keyValues.length;
 
             for (Double value : keyValues) {
-                script += value + ",";
+                data += value + ",";
             }
         }
-        script = script.substring(0, script.lastIndexOf(",")) + ")";
-        script += "\n";
+        data = data.substring(0, data.lastIndexOf(",")) + ")";
+        data += "\n";
 
-        script += "categs<-as.factor(rep(c(";
+        data += "categs<-as.factor(rep(c(";
         for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
             String key = entrySet.getKey();
-            script += "\"" + key + "\",";
+            data += "\"" + key + "\",";
         }
-        script = script.substring(0, script.lastIndexOf(","));
-        script += "),each=" + size + "))";
-        script += "\n";
+        data = data.substring(0, data.lastIndexOf(","));
+        data += "),each=" + size + "))";
+        data += "\n";
 
-        script += "probs<-as.factor(rep(c(";
+        data += "probs<-as.factor(rep(c(";
         for (int i = 0; i < size; ++i) {
-            script += "\"" + i + "\",";
+            data += "\"" + i + "\",";
         }
-        script = script.substring(0, script.lastIndexOf(","));
-        script += ")," + values.size() + "))";
-        script += "\n";
+        data = data.substring(0, data.lastIndexOf(","));
+        data += ")," + values.size() + "))";
+        data += "\n";
 
+        script += data;
         script += "result <- friedman.test(ARRAY,categs,probs)\n";
         script += "print(result);\n";
         script += "pos_teste<-posthoc.friedman.nemenyi.test(ARRAY, categs, probs, method='Tukey');\n";
         script += "print(pos_teste)\n";
 
+        String scriptPlot = "require(\"scmamp\")\n";
+        scriptPlot += data;
+        if (isMinimization) { // if indicator is minimization (eg. IGD)
+            scriptPlot += "neg = ARRAY * -1\n";
+        } else { // if the indicator is maximization (eg. HV)
+            scriptPlot += "neg = ARRAY\n";
+        }
+
+        scriptPlot += "d <- split(neg, ceiling(seq_along(neg)/" + size + "))\n"
+                + "df <- data.frame(d)\n"
+                + "colnames(df) <- unique(categs)\n"
+                + "\n"
+                + "setEPS()\n"
+                + "postscript(\"" + outputDir + "/criticaldifference.eps\")\n"
+                + "output <- plotCD(df, alpha=0.05 )\n"
+                + "dev.off()\n";
+
         StatisticalTests.checkDirectory(outputDir);
         File scriptFile = new File(outputDir + "/friedmanscript.R");
+        File scriptPlotFile = new File(outputDir + "/friedmanplot.R");
         File outputFile = new File(outputDir + "/friedmanoutput.R");
 
         try (FileWriter scriptWriter = new FileWriter(scriptFile)) {
             scriptWriter.append(script);
+        }        
+        
+        try (FileWriter scriptWriter = new FileWriter(scriptPlotFile)) {
+            scriptWriter.append(scriptPlot);
         }
 
         ProcessBuilder processBuilder = new ProcessBuilder("R", "--slave", "-f", scriptFile.getAbsolutePath());
@@ -91,7 +124,7 @@ public class FriedmanTest {
             while ((line = br.readLine()) != null) {
                 System.err.println(line);
             }
-            throw new InterruptedException("R process failed! Check if R is installed");
+            throw new InterruptedException("R process failed! Check if R and depencencies are installed");
         }
 
         ArrayList<Map.Entry<String, double[]>> entrySets = new ArrayList<>(values.entrySet());
@@ -138,7 +171,7 @@ public class FriedmanTest {
             for (Map.Entry<String, Double> entry2 : value.entrySet()) {
                 String key2 = entry2.getKey();
                 double dvalue = entry2.getValue();
-                
+
                 if (dvalue < 0.05) {
                     result.get(key).put(key2, true);
                 } else {

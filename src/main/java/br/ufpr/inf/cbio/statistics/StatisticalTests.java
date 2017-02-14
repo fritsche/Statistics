@@ -335,7 +335,7 @@ public class StatisticalTests {
                 (new File(outDir)).mkdirs();
             }
 
-            HashMap<String, HashMap<String, Boolean>> result = FriedmanTest.test(values, outDir + "/" + indicator + "");
+            HashMap<String, HashMap<String, Boolean>> result = FriedmanTest.test(values, outDir + "/" + indicator + "", isMinimization.get(indicator) );
 
             boolean difference = true;
             for (Map.Entry<String, Boolean> b : result.get(sbest).entrySet()) {
