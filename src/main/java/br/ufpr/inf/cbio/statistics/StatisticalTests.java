@@ -118,7 +118,7 @@ public class StatisticalTests {
                         best = value;
                     }
                 }
-                algorithmgrey.put(sbest, true);
+                algorithmgrey.put(sbest, true); // gray to the best
                 HashMap<String, Boolean> test = new HashMap<String, Boolean>();
                 // TEST
                 HashMap<String, HashMap<String, HashMap<String, Boolean>>> aux1 = statisticalData
@@ -129,14 +129,7 @@ public class StatisticalTests {
 
                 for (Map.Entry<String, Boolean> b : statisticalData.get(indicator.getKey()).get(problem.getKey())
                         .get(sbest).entrySet()) {
-                    algorithmgrey.put(b.getKey(), false);
-                    if (!b.getValue()) { // if there is NOT statistical
-                        // difference
-                        algorithmgrey.put(sbest, false); // the best is not
-                        // guaranteed;
-                        // remove from grey
-                        // list
-                    }
+                    algorithmgrey.put(b.getKey(), !b.getValue()); // if not different to the best then gray else not gray
                 }
                 problemmean.put(problem.getKey(), algorithmmean);
                 problemstd.put(problem.getKey(), algorithmstd);
@@ -335,7 +328,7 @@ public class StatisticalTests {
                 (new File(outDir)).mkdirs();
             }
 
-            HashMap<String, HashMap<String, Boolean>> result = FriedmanTest.test(values, outDir + "/" + indicator + "", isMinimization.get(indicator) );
+            HashMap<String, HashMap<String, Boolean>> result = FriedmanTest.test(values, outDir + "/" + indicator + "", isMinimization.get(indicator));
 
             boolean difference = true;
             for (Map.Entry<String, Boolean> b : result.get(sbest).entrySet()) {
@@ -484,8 +477,8 @@ public class StatisticalTests {
             tests.generateLatexTables(indicatorNameList, problemNameList, algorithmNameList, outputDir,
                     experimentName, m);
         }
-        
+
         tests.generateOverallStatisticalTest(indicator, objectives, problemNameList, algorithmNameList,
-                    outputDir, experimentName);
+                outputDir, experimentName);
     }
 }
