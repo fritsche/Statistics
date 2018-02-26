@@ -145,8 +145,6 @@ public class StatisticalTests {
         }
 
         FileWriter os, osbin;
-        StringBuilder sb = new StringBuilder();
-        Formatter formatter = new Formatter(sb, Locale.US);
         try {
             for (String i : indicatorNameList) {
                 checkDirectory(experimentBaseDirectory + "/R/" + experimentName + "/" + obj + "/");
@@ -163,11 +161,11 @@ public class StatisticalTests {
                         }
 
                         if (bold.get(i).get(p).equals(a)) {
-                            os.write(" {\\bf " + formatter.format("%6g", mean.get(i).get(p).get(a)) + "}"
+                            os.write(" {\\bf " + (new Formatter(Locale.US)).format("%6g", mean.get(i).get(p).get(a)) + "}"
                             );
                             osbin.write(" 1");
                         } else {
-                            os.write(" " + formatter.format("%6g", mean.get(i).get(p).get(a)));
+                            os.write(" " + (new Formatter(Locale.US)).format("%6g", mean.get(i).get(p).get(a)));
                             osbin.write(" 0");
                         }
                     }
