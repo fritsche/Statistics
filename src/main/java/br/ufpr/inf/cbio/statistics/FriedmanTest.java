@@ -96,7 +96,7 @@ public class FriedmanTest {
                 + "colnames(df) <- unique(categs)\n"
                 + "\n"
                 + "setEPS()\n"
-                + "postscript(\"" + outputDir + "/criticaldifference.eps\")\n"
+                + "postscript(\"" + outputDir + "/criticaldifference.eps\", width = 4.0, height = 3.0, horizontal = FALSE, onefile = FALSE, paper = \"special\", family = \"NimbusSan\", encoding = \"TeXtext.enc\")\n"
                 + "output <- plotCD(df, alpha=0.05 )\n"
                 + "dev.off()\n";
 
