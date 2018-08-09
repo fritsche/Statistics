@@ -38,9 +38,11 @@ public class StatisticalTests {
         isMinimization = new HashMap<>();
         isMinimization.put("HV", false);
         isMinimization.put("IGD", true);
+        isMinimization.put("IGDP", true);
         isMinimization.put("R2", true);
         isMinimization.put("EP", true);
         isMinimization.put("GD", true);
+        isMinimization.put("GDP", true);
         isMinimization.put("IGD+", true);
 
         data = new HashMap<String, HashMap<String, HashMap<String, double[]>>>();
