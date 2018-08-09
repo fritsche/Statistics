@@ -14,10 +14,12 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 //import org.apache.commons.math3.*;
@@ -37,6 +39,7 @@ public class StatisticalTests {
     public StatisticalTests() {
         isMinimization = new HashMap<>();
         isMinimization.put("HV", false);
+        isMinimization.put("HVA", false);
         isMinimization.put("IGD", true);
         isMinimization.put("IGDP", true);
         isMinimization.put("R2", true);
@@ -59,6 +62,7 @@ public class StatisticalTests {
             try {
                 for (String algorithm : algorithmNameList) {
                     ArrayList<Double> d = new ArrayList<Double>();
+                    System.out.println(experimentBaseDirectory + "/" + m + "/data/" + algorithm + "/" + problem + "/" + indicator);
                     FileInputStream fis = new FileInputStream(
                             experimentBaseDirectory + "/" + m + "/data/" + algorithm + "/" + problem + "/" + indicator);
                     InputStreamReader isr = new InputStreamReader(fis);
@@ -145,7 +149,6 @@ public class StatisticalTests {
         }
 
         FileWriter os, osbin;
-        NumberFormat formatter = new DecimalFormat("0.##E0");
         try {
             for (String i : indicatorNameList) {
                 checkDirectory(experimentBaseDirectory + "/R/" + experimentName + "/" + obj + "/");
@@ -162,12 +165,11 @@ public class StatisticalTests {
                         }
 
                         if (bold.get(i).get(p).equals(a)) {
-                            os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "("
-                                    + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")}");
+                            os.write(" {\\bf " + (new Formatter(Locale.US)).format("%6g", mean.get(i).get(p).get(a)) + "}"
+                            );
                             osbin.write(" 1");
                         } else {
-                            os.write(" " + formatter.format(mean.get(i).get(p).get(a)) + "("
-                                    + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")");
+                            os.write(" " + (new Formatter(Locale.US)).format("%6g", mean.get(i).get(p).get(a)));
                             osbin.write(" 0");
                         }
                     }
