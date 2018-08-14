@@ -62,7 +62,6 @@ public class StatisticalTests {
             try {
                 for (String algorithm : algorithmNameList) {
                     ArrayList<Double> d = new ArrayList<Double>();
-                    System.out.println(experimentBaseDirectory + "/" + m + "/data/" + algorithm + "/" + problem + "/" + indicator);
                     FileInputStream fis = new FileInputStream(
                             experimentBaseDirectory + "/" + m + "/data/" + algorithm + "/" + problem + "/" + indicator);
                     InputStreamReader isr = new InputStreamReader(fis);
