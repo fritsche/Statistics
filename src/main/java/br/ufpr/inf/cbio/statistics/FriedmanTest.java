@@ -25,20 +25,21 @@ import java.util.Scanner;
 
 public class FriedmanTest {
 
-    public static double confidence = 0.99;
-
     /**
      *
      * @param values
      * @param outputDir
+     * @param isMinimization
+     * @param confidence
      * @return matrix alg x alg a cell is true if there is statistical
      * difference between the alg_column and the alg_line false otherwise
      * @throws java.io.IOException
      * @throws java.lang.InterruptedException
      *
      */
-    public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir, boolean isMinimization)
-            throws IOException, InterruptedException {
+    public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir, boolean isMinimization, float confidence) throws IOException, InterruptedException {
+
+        float alpha = 1f - confidence;
 
         /**
          * To install graph and Rgraphviz: #
@@ -97,7 +98,7 @@ public class FriedmanTest {
                 + "\n"
                 + "setEPS()\n"
                 + "postscript(\"" + outputDir + "/criticaldifference.eps\", width = 4.0, height = 3.0, horizontal = FALSE, onefile = FALSE, paper = \"special\", family = \"NimbusSan\", encoding = \"TeXtext.enc\")\n"
-                + "output <- plotCD(df, alpha=0.05 )\n"
+                + "output <- plotCD(df, alpha=" + alpha + " )\n"
                 + "dev.off()\n";
 
         StatisticalTests.checkDirectory(outputDir);
@@ -107,8 +108,8 @@ public class FriedmanTest {
 
         try (FileWriter scriptWriter = new FileWriter(scriptFile)) {
             scriptWriter.append(script);
-        }        
-        
+        }
+
         try (FileWriter scriptWriter = new FileWriter(scriptPlotFile)) {
             scriptWriter.append(scriptPlot);
         }
@@ -133,7 +134,7 @@ public class FriedmanTest {
         HashMap<String, HashMap<String, Double>> matrix = new HashMap<>();
 
         int combinacoes = values.size();
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
         Scanner scanner = new Scanner(outputFile);
         while (scanner.hasNextLine()) {
             lines.add(scanner.nextLine());
@@ -167,12 +168,12 @@ public class FriedmanTest {
         for (Map.Entry<String, HashMap<String, Double>> entry : matrix.entrySet()) {
             String key = entry.getKey();
             HashMap<String, Double> value = entry.getValue();
-            result.put(key, new HashMap<String, Boolean>());
+            result.put(key, new HashMap<>());
             for (Map.Entry<String, Double> entry2 : value.entrySet()) {
                 String key2 = entry2.getKey();
                 double dvalue = entry2.getValue();
 
-                if (dvalue < 0.05) {
+                if (dvalue < alpha) {
                     result.get(key).put(key2, true);
                 } else {
                     result.get(key).put(key2, false);

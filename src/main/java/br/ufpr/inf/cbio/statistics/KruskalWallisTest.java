@@ -12,8 +12,10 @@ import java.util.Scanner;
 
 public class KruskalWallisTest {
 
-    public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir)
-            throws IOException, InterruptedException {
+    public static HashMap<String, HashMap<String, Boolean>> test(HashMap<String, double[]> values, String outputDir, float confidence) throws IOException, InterruptedException {
+
+        float alpha = 1f - confidence;
+
         String script = "require(PMCMR)\noptions(\"width\"=10000)\n";
         script += "ARRAY <- c(";
         int size = 0;
@@ -100,7 +102,7 @@ public class KruskalWallisTest {
                 }
             }
         }
-        
+
         for (Map.Entry<String, HashMap<String, Double>> entry : matrix.entrySet()) {
             String key = entry.getKey();
             HashMap<String, Double> value = entry.getValue();
@@ -108,8 +110,8 @@ public class KruskalWallisTest {
             for (Map.Entry<String, Double> entry2 : value.entrySet()) {
                 String key2 = entry2.getKey();
                 double dvalue = entry2.getValue();
-                
-                if (dvalue < 0.05) {
+
+                if (dvalue < alpha) {
                     result.get(key).put(key2, true);
                 } else {
                     result.get(key).put(key2, false);

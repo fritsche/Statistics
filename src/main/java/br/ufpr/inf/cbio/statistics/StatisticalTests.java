@@ -54,7 +54,7 @@ public class StatisticalTests {
     }
 
     public void generateStatisticalTests(String indicator, List<String> problemNameList, List<String> algorithmNameList,
-            String experimentBaseDirectory, int m, String experimentName) {
+            String experimentBaseDirectory, int m, String experimentName, float confidence) {
         HashMap<String, HashMap<String, HashMap<String, Boolean>>> output = new HashMap<String, HashMap<String, HashMap<String, Boolean>>>();
         HashMap<String, HashMap<String, double[]>> indicatormap = new HashMap<String, HashMap<String, double[]>>();
         for (String problem : problemNameList) {
@@ -79,7 +79,7 @@ public class StatisticalTests {
                     values.put(algorithm, dd);
                 }
                 output.put(problem, KruskalWallisTest.test(values,
-                        experimentBaseDirectory + "/R/" + experimentName + "/" + indicator + "/" + m));
+                        experimentBaseDirectory + "/R/" + experimentName + "/" + indicator + "/" + m, confidence));
                 indicatormap.put(problem, values);
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
@@ -187,7 +187,7 @@ public class StatisticalTests {
     }
 
     public void generateOverallStatisticalTest(String indicator, int[] mm, List<String> problemNameList,
-            List<String> algorithmNameList, String experimentBaseDirectory, String experimentName) {
+            List<String> algorithmNameList, String experimentBaseDirectory, String experimentName, float confidence) {
         HashMap<String, double[]> values = new HashMap<String, double[]>();
         int i, j, k;
         int posicion;
@@ -332,7 +332,7 @@ public class StatisticalTests {
                 (new File(outDir)).mkdirs();
             }
 
-            HashMap<String, HashMap<String, Boolean>> result = FriedmanTest.test(values, outDir + "/" + indicator + "", isMinimization.get(indicator));
+            HashMap<String, HashMap<String, Boolean>> result = FriedmanTest.test(values, outDir + "/" + indicator + "", isMinimization.get(indicator), confidence);
 
             boolean difference = true;
             for (Map.Entry<String, Boolean> b : result.get(sbest).entrySet()) {
@@ -432,6 +432,7 @@ public class StatisticalTests {
         // objective list
         // output directory
         // experiment name
+        // confidence level [eg.: 0.99]
         LinkedList<String> arguments = new LinkedList<>(Arrays.asList(args));
 
         Iterator<String> iterator = arguments.iterator();
@@ -469,6 +470,8 @@ public class StatisticalTests {
         String experimentName = iterator.next();
         System.out.println("experimentName: " + experimentName);
 
+        float confidence = Float.parseFloat(iterator.next());
+
         List<String> indicatorNameList = new ArrayList<>();
         indicatorNameList.add(indicator);
         StatisticalTests tests = new StatisticalTests();
@@ -476,13 +479,13 @@ public class StatisticalTests {
         for (int m : objectives) {
 
             tests.generateStatisticalTests(indicator, problemNameList, algorithmNameList, outputDir, m,
-                    experimentName);
+                    experimentName, confidence);
 
             tests.generateLatexTables(indicatorNameList, problemNameList, algorithmNameList, outputDir,
                     experimentName, m);
         }
 
         tests.generateOverallStatisticalTest(indicator, objectives, problemNameList, algorithmNameList,
-                outputDir, experimentName);
+                outputDir, experimentName, confidence);
     }
 }
