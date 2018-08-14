@@ -148,6 +148,7 @@ public class StatisticalTests {
         }
 
         FileWriter os, osbin;
+        NumberFormat formatter = new DecimalFormat("0.##E0");
         try {
             for (String i : indicatorNameList) {
                 checkDirectory(experimentBaseDirectory + "/R/" + experimentName + "/" + obj + "/");
@@ -164,11 +165,12 @@ public class StatisticalTests {
                         }
 
                         if (bold.get(i).get(p).equals(a)) {
-                            os.write(" {\\bf " + (new Formatter(Locale.US)).format("%6g", mean.get(i).get(p).get(a)) + "}"
-                            );
+                            os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "("
+                                    + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")}");
                             osbin.write(" 1");
                         } else {
-                            os.write(" " + (new Formatter(Locale.US)).format("%6g", mean.get(i).get(p).get(a)));
+                            os.write(" " + formatter.format(mean.get(i).get(p).get(a)) + "("
+                                    + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")");
                             osbin.write(" 0");
                         }
                     }
