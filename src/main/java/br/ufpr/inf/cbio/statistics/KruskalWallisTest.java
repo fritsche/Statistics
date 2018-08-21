@@ -16,7 +16,7 @@ public class KruskalWallisTest {
 
         float alpha = 1f - confidence;
 
-        String script = "require(PMCMR)\noptions(\"width\"=10000)\n";
+        String script = "require(PMCMRplus)\noptions(\"width\"=10000)\n";
         script += "ARRAY <- c(";
         int size = 0;
         for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
@@ -40,7 +40,7 @@ public class KruskalWallisTest {
         script += "\n";
         script += "result <- kruskal.test(ARRAY,categs)\n";
         script += "print(result);";
-        script += "pos_teste<-posthoc.kruskal.nemenyi.test(ARRAY, categs, method='Tukey');";
+        script += "pos_teste<-kwAllPairsNemenyiTest(ARRAY, categs, method='Tukey');";
         script += "print(pos_teste);";
 
         StatisticalTests.checkDirectory(outputDir);

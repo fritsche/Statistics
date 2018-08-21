@@ -46,7 +46,7 @@ public class FriedmanTest {
          * source("http://bioconductor.org/biocLite.R") #
          * biocLite(c("graph","Rgraphviz"))
          */
-        String script = "require(\"PMCMR\")\n"
+        String script = "require(\"PMCMRplus\")\n"
                 + "options(\"width\"=10000)\n";
         String data = "ARRAY <- c(";
         int size = 0;
@@ -81,7 +81,7 @@ public class FriedmanTest {
         script += data;
         script += "result <- friedman.test(ARRAY,categs,probs)\n";
         script += "print(result);\n";
-        script += "pos_teste<-posthoc.friedman.nemenyi.test(ARRAY, categs, probs, method='Tukey');\n";
+        script += "pos_teste<-frdAllPairsNemenyiTest(ARRAY, categs, probs, method='Tukey');\n";
         script += "print(pos_teste)\n";
 
         String scriptPlot = "require(\"scmamp\")\n";
