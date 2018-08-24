@@ -77,16 +77,16 @@ public class KruskalWallisTest {
             lines.add(scanner.nextLine());
         }
 
-        for (int i = lines.size() - combinacoes - 1; i < lines.size() - 2; i++) {
+        for (int i = lines.size() - combinacoes - 2; i < lines.size() - 3; i++) {
             for (int j = 0; j < combinacoes - 1; j++) {
                 String l = lines.get(i).split("\\s+")[0];
-                String c = lines.get(lines.size() - combinacoes - 2).split("\\s+")[j + 1];
+                String c = lines.get(lines.size() - combinacoes - 3).split("\\s+")[j + 1];
                 matrix.put(l, new HashMap<>());
                 matrix.put(c, new HashMap<>());
             }
         }
 
-        for (int i = lines.size() - combinacoes - 1; i < lines.size() - 2; i++) {
+        for (int i = lines.size() - combinacoes - 2; i < lines.size() - 3; i++) {
             double[] splittedValue = new double[combinacoes];
 
             for (int j = 0; j < combinacoes - 1; j++) {
