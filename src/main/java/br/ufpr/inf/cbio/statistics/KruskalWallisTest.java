@@ -65,8 +65,6 @@ public class KruskalWallisTest {
             throw new InterruptedException("R process failed! Check if R is installed");
         }
 
-        ArrayList<Map.Entry<String, double[]>> entrySets = new ArrayList<>(values.entrySet());
-
         HashMap<String, HashMap<String, Boolean>> result = new HashMap<>();
         HashMap<String, HashMap<String, Double>> matrix = new HashMap<>();
 
@@ -77,26 +75,21 @@ public class KruskalWallisTest {
             lines.add(scanner.nextLine());
         }
 
-        for (int i = lines.size() - combinacoes - 2; i < lines.size() - 3; i++) {
+        for (int i = lines.size() - combinacoes + 1; i < lines.size(); i++) {
             for (int j = 0; j < combinacoes - 1; j++) {
                 String l = lines.get(i).split("\\s+")[0];
-                String c = lines.get(lines.size() - combinacoes - 3).split("\\s+")[j + 1];
+                String c = lines.get(lines.size() - combinacoes).split("\\s+")[j + 1];
                 matrix.put(l, new HashMap<>());
                 matrix.put(c, new HashMap<>());
             }
         }
 
-        for (int i = lines.size() - combinacoes - 2; i < lines.size() - 3; i++) {
-            double[] splittedValue = new double[combinacoes];
-
+        for (int i = lines.size() - combinacoes + 1; i < lines.size(); i++) {
             for (int j = 0; j < combinacoes - 1; j++) {
-
                 String part = lines.get(i).replace("<", "").split("\\s+")[j + 1];
-
                 if (part.compareTo("-") != 0) {
-
                     String l = lines.get(i).split("\\s+")[0];
-                    String c = lines.get(lines.size() - combinacoes - 2).split("\\s+")[j + 1];
+                    String c = lines.get(lines.size() - combinacoes).split("\\s+")[j + 1];
                     matrix.get(l).put(c, Double.parseDouble(part));
                     matrix.get(c).put(l, Double.parseDouble(part));
                 }
