@@ -1,4 +1,5 @@
-# Uses PMCMR R package for Statistical tests
+# Uses PMCMR R package for Statistical tests [![](https://jitpack.io/v/fritsche/Statistics.svg)](https://jitpack.io/#fritsche/Statistics)
+
 
 * Friedman
 
