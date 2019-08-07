@@ -27,6 +27,15 @@ After successful installation of the above Linux packages, repeat with the insta
 install.packages("PMCMRplus")
 ```
 
+**If `mvtnorm` R package is missing it is possible to install using Ubuntu ppa**
+
+```bash
+# find the package
+sudo apt search mvtnorm
+# install it
+sudo apt install r-cran-mvtnorm
+```
+
 ### For other distros
 
 - https://cran.r-project.org/web/packages/PMCMRplus/readme/README.html
