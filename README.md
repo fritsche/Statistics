@@ -39,6 +39,13 @@ sudo apt install r-cran-mvtnorm
 ```
 
 #### `scmamp`
+
+```bash
+sudo apt-get -y build-dep libcurl4-gnutls-dev
+sudo apt-get -y install libcurl4-gnutls-dev
+sudo apt-get install libcurl4-openssl-dev libssl-dev
+``` 
+
 ```R
 if (!require("devtools")) {
   install.packages("devtools")
@@ -46,6 +53,8 @@ if (!require("devtools")) {
 
 devtools::install_github("b0rxa/scmamp")
 ```
+
+
 
 More info: https://github.com/b0rxa/scmamp
 
