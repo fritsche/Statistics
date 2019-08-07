@@ -10,6 +10,8 @@
 
 ### Ubuntu and Debian
 
+#### `PMCMRplus`
+
 Check for the header files by running the following commands outside of R from the console.
 ```bash
 dpkg -p libgmp-dev
@@ -35,6 +37,17 @@ sudo apt search mvtnorm
 # install it
 sudo apt install r-cran-mvtnorm
 ```
+
+#### `scmamp`
+```R
+if (!require("devtools")) {
+  install.packages("devtools")
+}
+
+devtools::install_github("b0rxa/scmamp")
+```
+
+More info: https://github.com/b0rxa/scmamp
 
 ### For other distros
 
