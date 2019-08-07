@@ -186,7 +186,7 @@ public class StatisticalTests {
     }
 
     public void generateOverallStatisticalTest(String indicator, int[] mm, List<String> problemNameList,
-            List<String> algorithmNameList, String experimentBaseDirectory, String experimentName, float confidence) {
+            List<String> algorithmNameList, String experimentBaseDirectory, String experimentName, String group, float confidence) {
         HashMap<String, double[]> values = new HashMap<String, double[]>();
         int i, j, k;
         int posicion;
@@ -208,7 +208,7 @@ public class StatisticalTests {
                 for (int m : mm) {
                     for (String problem : problemNameList) {
                         FileInputStream fis = new FileInputStream(
-                                experimentBaseDirectory + "/" + m + "/data/" + algorithm + "/" + problem + "/" + indicator);
+                                experimentBaseDirectory + "/" + m + "/" + group + "/" + algorithm + "/" + problem + "/" + indicator);
                         InputStreamReader isr = new InputStreamReader(fis);
                         BufferedReader br = new BufferedReader(isr);
                         String aux = br.readLine();
@@ -468,7 +468,7 @@ public class StatisticalTests {
 
         String experimentName = iterator.next();
         System.out.println("experimentName: " + experimentName);
-        
+
         String group = iterator.next(); // subfolder for group of algorithms
         System.out.println("group: " + group);
 
@@ -488,6 +488,6 @@ public class StatisticalTests {
         }
 
         tests.generateOverallStatisticalTest(indicator, objectives, problemNameList, algorithmNameList,
-                outputDir, experimentName, confidence);
+                outputDir, experimentName, group, confidence);
     }
 }
