@@ -37,6 +37,7 @@ public class StatisticalTests {
     public StatisticalTests() {
         isMinimization = new HashMap<>();
         isMinimization.put("HV", false);
+        isMinimization.put("ARI", false);
         isMinimization.put("HVA", false);
         isMinimization.put("IGD", true);
         isMinimization.put("IGDP", true);
