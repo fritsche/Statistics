@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,7 +20,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 //import org.apache.commons.math3.*;
 
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
@@ -28,11 +30,11 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 public class StatisticalTests {
 
     // < Indicator < Problem < Algorithm , values > > >
-    private HashMap<String, HashMap<String, HashMap<String, double[]>>> data;
+    private final HashMap<String, HashMap<String, HashMap<String, double[]>>> data;
     // < Indicator < Problem < Algorithm < Algorithm, isDiff > > > >
-    private HashMap<String, HashMap<String, HashMap<String, HashMap<String, Boolean>>>> statisticalData;
+    private final HashMap<String, HashMap<String, HashMap<String, HashMap<String, Boolean>>>> statisticalData;
 
-    private HashMap<String, Boolean> isMinimization;
+    private final HashMap<String, Boolean> isMinimization;
 
     public StatisticalTests() {
         isMinimization = new HashMap<>();
@@ -47,63 +49,78 @@ public class StatisticalTests {
         isMinimization.put("GDP", true);
         isMinimization.put("IGD+", true);
 
-        data = new HashMap<String, HashMap<String, HashMap<String, double[]>>>();
-        statisticalData = new HashMap<String, HashMap<String, HashMap<String, HashMap<String, Boolean>>>>();
+        data = new HashMap<>();
+        statisticalData = new HashMap<>();
 
     }
 
     public void generateStatisticalTests(String indicator, List<String> problemNameList, List<String> algorithmNameList,
             String experimentBaseDirectory, int m, String experimentName, String group, float confidence) {
-        HashMap<String, HashMap<String, HashMap<String, Boolean>>> output = new HashMap<String, HashMap<String, HashMap<String, Boolean>>>();
-        HashMap<String, HashMap<String, double[]>> indicatormap = new HashMap<String, HashMap<String, double[]>>();
-        for (String problem : problemNameList) {
-            HashMap<String, double[]> values = new HashMap<String, double[]>();
+        HashMap<String, HashMap<String, HashMap<String, Boolean>>> output = new HashMap<>();
+        HashMap<String, HashMap<String, double[]>> indicatormap = new HashMap<>();
+        problemNameList.forEach((problem) -> {
             try {
-                for (String algorithm : algorithmNameList) {
-                    ArrayList<Double> d = new ArrayList<Double>();
-                    FileInputStream fis = new FileInputStream(
-                            experimentBaseDirectory + "/" + m + "/" + group + "/" + algorithm + "/" + problem + "/" + indicator);
-                    InputStreamReader isr = new InputStreamReader(fis);
-                    BufferedReader br = new BufferedReader(isr);
-                    String aux = br.readLine();
-                    while (aux != null) {
-                        d.add(Double.parseDouble(aux));
-                        aux = br.readLine();
+                HashMap<String, double[]> values = new HashMap<>();
+
+                algorithmNameList.forEach((algorithm) -> {
+                    FileInputStream fis = null;
+                    try {
+                        ArrayList<Double> d = new ArrayList<>();
+                        fis = new FileInputStream(
+                                experimentBaseDirectory + "/" + m + "/" + group + "/" + algorithm + "/" + problem + "/" + indicator);
+                        InputStreamReader isr = new InputStreamReader(fis);
+                        BufferedReader br = new BufferedReader(isr);
+                        String aux = br.readLine();
+                        while (aux != null) {
+                            d.add(Double.parseDouble(aux));
+                            aux = br.readLine();
+                        }
+                        double[] dd = new double[d.size()];
+                        for (int i = 0; i < d.size(); ++i) {
+                            dd[i] = d.get(i);
+                        }
+                        values.put(algorithm, dd);
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        try {
+                            fis.close();
+                        } catch (IOException ex) {
+                            Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                    double[] dd = new double[d.size()];
-                    for (int i = 0; i < d.size(); ++i) {
-                        dd[i] = d.get(i).doubleValue();
-                    }
-                    values.put(algorithm, dd);
-                }
+                });
                 output.put(problem, KruskalWallisTest.test(values,
                         experimentBaseDirectory + "/R/" + experimentName + "/" + indicator + "/" + m, confidence));
                 indicatormap.put(problem, values);
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+            } catch (IOException | InterruptedException ex) {
+                Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+
+        });
 
         statisticalData.put(indicator, output);
         data.put(indicator, indicatormap);
     }
 
     public void generateLatexTables(List<String> indicatorNameList, List<String> problemNameList,
-            List<String> algorithmNameList, String experimentBaseDirectory, String experimentName, int obj) {
+            List<String> algorithmNameList, String experimentBaseDirectory, String experimentName, int obj, boolean printSTD) {
         // < Indicator < Problem < Algorithm , value > > >
-        HashMap<String, HashMap<String, HashMap<String, Double>>> mean = new HashMap<String, HashMap<String, HashMap<String, Double>>>();
-        HashMap<String, HashMap<String, HashMap<String, Double>>> standardDeviation = new HashMap<String, HashMap<String, HashMap<String, Double>>>();
-        HashMap<String, HashMap<String, HashMap<String, Boolean>>> grey = new HashMap<String, HashMap<String, HashMap<String, Boolean>>>();
-        HashMap<String, HashMap<String, String>> bold = new HashMap<String, HashMap<String, String>>();
-        for (Map.Entry<String, HashMap<String, HashMap<String, double[]>>> indicator : data.entrySet()) {
-            HashMap<String, HashMap<String, Double>> problemmean = new HashMap<String, HashMap<String, Double>>();
-            HashMap<String, HashMap<String, Double>> problemstd = new HashMap<String, HashMap<String, Double>>();
-            HashMap<String, HashMap<String, Boolean>> problemgrey = new HashMap<String, HashMap<String, Boolean>>();
-            HashMap<String, String> problembold = new HashMap<String, String>();
-            for (Map.Entry<String, HashMap<String, double[]>> problem : indicator.getValue().entrySet()) {
-                HashMap<String, Double> algorithmmean = new HashMap<String, Double>();
-                HashMap<String, Double> algorithmstd = new HashMap<String, Double>();
-                HashMap<String, Boolean> algorithmgrey = new HashMap<String, Boolean>();
+        HashMap<String, HashMap<String, HashMap<String, Double>>> mean = new HashMap<>();
+        HashMap<String, HashMap<String, HashMap<String, Double>>> standardDeviation = new HashMap<>();
+        HashMap<String, HashMap<String, HashMap<String, Boolean>>> grey = new HashMap<>();
+        HashMap<String, HashMap<String, String>> bold = new HashMap<>();
+        data.entrySet().forEach((indicator) -> {
+            HashMap<String, HashMap<String, Double>> problemmean = new HashMap<>();
+            HashMap<String, HashMap<String, Double>> problemstd = new HashMap<>();
+            HashMap<String, HashMap<String, Boolean>> problemgrey = new HashMap<>();
+            HashMap<String, String> problembold = new HashMap<>();
+            indicator.getValue().entrySet().forEach((problem) -> {
+                HashMap<String, Double> algorithmmean = new HashMap<>();
+                HashMap<String, Double> algorithmstd = new HashMap<>();
+                HashMap<String, Boolean> algorithmgrey = new HashMap<>();
                 String sbest = "";
                 boolean minimization = isMinimization.get(indicator.getKey());
                 double best = (minimization) ? (Double.POSITIVE_INFINITY) : (Double.NEGATIVE_INFINITY);
@@ -123,7 +140,7 @@ public class StatisticalTests {
                     }
                 }
                 algorithmgrey.put(sbest, true); // gray to the best
-                HashMap<String, Boolean> test = new HashMap<String, Boolean>();
+                HashMap<String, Boolean> test = new HashMap<>();
                 // TEST
                 HashMap<String, HashMap<String, HashMap<String, Boolean>>> aux1 = statisticalData
                         .get(indicator.getKey());
@@ -139,17 +156,18 @@ public class StatisticalTests {
                 problemstd.put(problem.getKey(), algorithmstd);
                 problemgrey.put(problem.getKey(), algorithmgrey);
                 problembold.put(problem.getKey(), sbest);
-            }
+            });
             mean.put(indicator.getKey(), problemmean);
             standardDeviation.put(indicator.getKey(), problemstd);
             grey.put(indicator.getKey(), problemgrey);
             bold.put(indicator.getKey(), problembold);
-        }
+        });
 
         FileWriter os, osbin;
         NumberFormat formatter = new DecimalFormat("0.##E0");
-        try {
-            for (String i : indicatorNameList) {
+
+        for (String i : indicatorNameList) {
+            try {
                 checkDirectory(experimentBaseDirectory + "/R/" + experimentName + "/" + obj + "/");
                 os = new FileWriter(experimentBaseDirectory + "/R/" + experimentName + "/" + obj + "/" + i + ".tex");
                 osbin = new FileWriter(experimentBaseDirectory + "/R/" + experimentName + "/" + obj + "/" + i + ".bin");
@@ -163,14 +181,24 @@ public class StatisticalTests {
                             os.write(" &");
                         }
 
-                        if (bold.get(i).get(p).equals(a)) {
-                            os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "("
-                                    + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")}");
-                            osbin.write(" 1");
+                        if (printSTD) {
+                            if (bold.get(i).get(p).equals(a)) {
+                                os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "("
+                                        + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")}");
+                                osbin.write(" 1");
+                            } else {
+                                os.write(" " + formatter.format(mean.get(i).get(p).get(a)) + "("
+                                        + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")");
+                                osbin.write(" 0");
+                            }
                         } else {
-                            os.write(" " + formatter.format(mean.get(i).get(p).get(a)) + "("
-                                    + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")");
-                            osbin.write(" 0");
+                            if (bold.get(i).get(p).equals(a)) {
+                                os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "}");
+                                osbin.write(" 1");
+                            } else {
+                                os.write(" " + formatter.format(mean.get(i).get(p).get(a)));
+                                osbin.write(" 0");
+                            }
                         }
                     }
                     osbin.write("\n");
@@ -178,61 +206,66 @@ public class StatisticalTests {
                 }
                 os.close();
                 osbin.close();
+            } catch (IOException ex) {
+                Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
         }
-
     }
 
     public void generateOverallStatisticalTest(String indicator, int[] mm, List<String> problemNameList,
-            List<String> algorithmNameList, String experimentBaseDirectory, String experimentName, String group, float confidence) {
-        HashMap<String, double[]> values = new HashMap<String, double[]>();
-        int i, j, k;
-        int posicion;
-        int ig;
-        double sum;
-
-        double Rj[];
-        double std[];
-
-        boolean encontrado;
-
-        boolean visto[];
-        Vector porVisitar;
-
+            List<String> algorithmNameList, String experimentBaseDirectory, String experimentName, String group, float confidence, boolean printSTD) {
         try {
+            HashMap<String, double[]> values = new HashMap<>();
+            int i, j, k;
+            int posicion;
+            int ig;
+            double sum;
+            double Rj[];
+            double std[];
+            boolean encontrado;
+            boolean visto[];
+            List porVisitar;
             for (String algorithm : algorithmNameList) {
                 // System.out.println(algorithm);
-                ArrayList<Double> d = new ArrayList<Double>();
+                ArrayList<Double> d = new ArrayList<>();
                 for (int m : mm) {
                     for (String problem : problemNameList) {
                         FileInputStream fis = new FileInputStream(
                                 experimentBaseDirectory + "/" + m + "/" + group + "/" + algorithm + "/" + problem + "/" + indicator);
-                        InputStreamReader isr = new InputStreamReader(fis);
-                        BufferedReader br = new BufferedReader(isr);
-                        String aux = br.readLine();
-                        sum = 0.0;
-                        int count = 0;
-                        while (aux != null) {
-                            sum += Double.parseDouble(aux);
-                            count++;
-                            aux = br.readLine();
+                        try {
+                            InputStreamReader isr = new InputStreamReader(fis);
+                            BufferedReader br = new BufferedReader(isr);
+                            String aux = br.readLine();
+                            sum = 0.0;
+                            int count = 0;
+                            while (aux != null) {
+                                sum += Double.parseDouble(aux);
+                                count++;
+                                aux = br.readLine();
+                            }
+                            d.add((sum / (double) count));
+                            // System.out.println((sum/(double)count));
+                        } catch (FileNotFoundException ex) {
+                            Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
+                            Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
+                        } finally {
+                            try {
+                                fis.close();
+                            } catch (IOException ex) {
+                                Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
-                        d.add((sum / (double) count));
-                        // System.out.println((sum/(double)count));
                     }
                 }
                 // System.out.println();
                 double[] dd = new double[d.size()];
                 for (i = 0; i < d.size(); ++i) {
-                    dd[i] = d.get(i).doubleValue();
+                    dd[i] = d.get(i);
                 }
                 values.put(algorithm, dd);
             }
-
-            ArrayList<double[]> matrix = new ArrayList<double[]>();
+            ArrayList<double[]> matrix = new ArrayList<>();
             int size = 0;
             for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
                 // System.out.println(entrySet.getKey());
@@ -240,7 +273,6 @@ public class StatisticalTests {
                 matrix.add(keyValues);
                 size = keyValues.length;
             }
-
             Pareja[][] orden = new Pareja[size][matrix.size()];
             for (i = 0; i < size; ++i) {
                 for (j = 0; j < matrix.size(); ++j) {
@@ -267,18 +299,17 @@ public class StatisticalTests {
                     rank[i][j] = new Pareja(posicion, orden[i][posicion - 1].valor);
                 }
             }
-
             /*
-			 * In the case of having the same performance, the rankings are
-			 * equal
+            * In the case of having the same performance, the rankings are
+            * equal
              */
             for (i = 0; i < size; i++) {
                 visto = new boolean[matrix.size()];
-                porVisitar = new Vector();
+                porVisitar = new ArrayList();
 
                 Arrays.fill(visto, false);
                 for (j = 0; j < matrix.size(); j++) {
-                    porVisitar.removeAllElements();
+                    porVisitar.clear();
                     sum = rank[i][j].indice;
                     visto[j] = true;
                     ig = 1;
@@ -286,18 +317,17 @@ public class StatisticalTests {
                         if (rank[i][j].valor == rank[i][k].valor && !visto[k]) {
                             sum += rank[i][k].indice;
                             ig++;
-                            porVisitar.add(new Integer(k));
+                            porVisitar.add(k);
                             visto[k] = true;
                         }
                     }
                     sum /= (double) ig;
                     rank[i][j].indice = sum;
                     for (k = 0; k < porVisitar.size(); k++) {
-                        rank[i][((Integer) porVisitar.elementAt(k)).intValue()].indice = sum;
+                        rank[i][((Integer) porVisitar.get(k))].indice = sum;
                     }
                 }
             }
-
             /* compute the average ranking for each algorithm */
             String sbest = "";
             double best = Double.POSITIVE_INFINITY;
@@ -324,16 +354,12 @@ public class StatisticalTests {
                 }
                 i++;
             }
-
             String outDir = experimentBaseDirectory + "/R/" + experimentName + "";
             String outFile = outDir + "/FriedmanTest" + indicator + ".tex";
-
             if (!(new File(outDir)).exists()) {
                 (new File(outDir)).mkdirs();
             }
-
             HashMap<String, HashMap<String, Boolean>> result = FriedmanTest.test(values, outDir + "/" + indicator + "", isMinimization.get(indicator), confidence);
-
             boolean difference = true;
             for (Map.Entry<String, Boolean> b : result.get(sbest).entrySet()) {
                 if (!b.getValue()) { // if there is NOT statistical difference
@@ -341,9 +367,7 @@ public class StatisticalTests {
                     break;
                 }
             }
-
             NumberFormat formatter = new DecimalFormat("0.000");
-
             String Output = "";
             Output = Output + ("\\documentclass{article}\n" + "\\usepackage{graphicx}"
                     + "\\usepackage{colortbl}\n"
@@ -359,7 +383,6 @@ public class StatisticalTests {
                     + "\n" + "\\title{Results}\n"
                     + "\\author{}\n" + "\\date{\\today}\n" + "\\begin{document}\n"
                     + "\\oddsidemargin 0in \\topmargin 0in" + "\\maketitle\n" + "\\section{Tables of Friedman Tests}");
-
             /* Print the average ranking per algorithm */
             Output = Output + "\n"
                     + ("\\begin{table}[!htp]\n" + "\\centering\n" + "\\caption{Average Rankings of the algorithms\n}"
@@ -370,25 +393,37 @@ public class StatisticalTests {
                     // problem\n}"
                     // +
                     "\\begin{tabular}{|c|c|}\n" + "\\hline\nAlgorithm&Ranking\\\\\n\\hline");
-
             i = 0;
-            for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
-                // for (i=0; i<matrix.size();i++) {
-                if (entrySet.getKey().equals(sbest) && difference) {
-                    Output = Output + "\n" + (String) entrySet.getKey() + "& \\cellcolor{gray95} {\\bf "
-                            + formatter.format(Rj[i]) + "(" + formatter.format(std[i]) + ")}\\\\\\hline";
-                } else if (entrySet.getKey().equals(sbest)) {
-                    Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + formatter.format(Rj[i]) + "("
-                            + formatter.format(std[i]) + ")}\\\\\\hline";
-                } else {
-                    Output = Output + "\n" + (String) entrySet.getKey() + "&" + formatter.format(Rj[i]) + "("
-                            + formatter.format(std[i]) + ")\\\\\\hline";
+            if (printSTD) {
+                for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
+                    // for (i=0; i<matrix.size();i++) {
+                    if (entrySet.getKey().equals(sbest) && difference) {
+                        Output = Output + "\n" + (String) entrySet.getKey() + "& \\cellcolor{gray95} {\\bf "
+                                + formatter.format(Rj[i]) + "(" + formatter.format(std[i]) + ")}\\\\\\hline";
+                    } else if (entrySet.getKey().equals(sbest)) {
+                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + formatter.format(Rj[i]) + "("
+                                + formatter.format(std[i]) + ")}\\\\\\hline";
+                    } else {
+                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + formatter.format(Rj[i]) + "("
+                                + formatter.format(std[i]) + ")\\\\\\hline";
+                    }
+                    i++;
                 }
-                i++;
+            } else {
+                for (Map.Entry<String, double[]> entrySet : values.entrySet()) {
+                    // for (i=0; i<matrix.size();i++) {
+                    if (entrySet.getKey().equals(sbest) && difference) {
+                        Output = Output + "\n" + (String) entrySet.getKey() + "& \\cellcolor{gray95} {\\bf "
+                                + formatter.format(Rj[i]) + "}\\\\\\hline";
+                    } else if (entrySet.getKey().equals(sbest)) {
+                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + formatter.format(Rj[i]) + "}\\\\\\hline";
+                    } else {
+                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + formatter.format(Rj[i]) + "\\\\\\hline";
+                    }
+                    i++;
+                }
             }
-
             Output = Output + "\n" + "\\end{tabular}\n" + "\\end{table}";
-
             Output = Output + "\n" + "\\end{document}";
             // try {
             File latexOutput;
@@ -396,18 +431,14 @@ public class StatisticalTests {
             if (!latexOutput.exists()) {
                 latexOutput.mkdirs();
             }
-            FileOutputStream f = new FileOutputStream(outFile);
-            DataOutputStream fis = new DataOutputStream((OutputStream) f);
-
-            fis.writeBytes(Output);
-
-            fis.close();
-            f.close();
-            // }
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            try (FileOutputStream f = new FileOutputStream(outFile); DataOutputStream fis = new DataOutputStream((OutputStream) f)) {
+                fis.writeBytes(Output);
+                // }
+            }
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(StatisticalTests.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 
     public static void checkDirectory(String directory) {
@@ -433,6 +464,7 @@ public class StatisticalTests {
         // output directory
         // experiment name
         // confidence level [eg.: 0.99]
+        // print std [TRUE|FALSE]
         LinkedList<String> arguments = new LinkedList<>(Arrays.asList(args));
 
         Iterator<String> iterator = arguments.iterator();
@@ -475,6 +507,8 @@ public class StatisticalTests {
 
         float confidence = Float.parseFloat(iterator.next());
 
+        boolean printSTD = Boolean.parseBoolean(iterator.next());
+
         List<String> indicatorNameList = new ArrayList<>();
         indicatorNameList.add(indicator);
         StatisticalTests tests = new StatisticalTests();
@@ -485,10 +519,10 @@ public class StatisticalTests {
                     experimentName, group, confidence);
 
             tests.generateLatexTables(indicatorNameList, problemNameList, algorithmNameList, outputDir,
-                    experimentName, m);
+                    experimentName, m, printSTD);
         }
 
         tests.generateOverallStatisticalTest(indicator, objectives, problemNameList, algorithmNameList,
-                outputDir, experimentName, group, confidence);
+                outputDir, experimentName, group, confidence, printSTD);
     }
 }
