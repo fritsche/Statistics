@@ -180,20 +180,20 @@ public class StatisticalTests {
 
                         if (printSTD) {
                             if (bold.get(i).get(p).equals(a)) {
-                                os.write(" {\\bf " + String.format("%g", mean.get(i).get(p).get(a)) + "("
-                                        + String.format("%g", standardDeviation.get(i).get(p).get(a)) + ")}");
+                                os.write(" {\\bf " + String.format("%.3g", mean.get(i).get(p).get(a)) + "("
+                                        + String.format("%.3g", standardDeviation.get(i).get(p).get(a)) + ")}");
                                 osbin.write(" 1");
                             } else {
-                                os.write(" " + String.format("%g", mean.get(i).get(p).get(a)) + "("
-                                        + String.format("%g", standardDeviation.get(i).get(p).get(a)) + ")");
+                                os.write(" " + String.format("%.3g", mean.get(i).get(p).get(a)) + "("
+                                        + String.format("%.3g", standardDeviation.get(i).get(p).get(a)) + ")");
                                 osbin.write(" 0");
                             }
                         } else {
                             if (bold.get(i).get(p).equals(a)) {
-                                os.write(" {\\bf " + String.format("%g", mean.get(i).get(p).get(a)) + "}");
+                                os.write(" {\\bf " + String.format("%.3g", mean.get(i).get(p).get(a)) + "}");
                                 osbin.write(" 1");
                             } else {
-                                os.write(" " + String.format("%g", mean.get(i).get(p).get(a)));
+                                os.write(" " + String.format("%.3g", mean.get(i).get(p).get(a)));
                                 osbin.write(" 0");
                             }
                         }
@@ -396,13 +396,13 @@ public class StatisticalTests {
                     // for (i=0; i<matrix.size();i++) {
                     if (entrySet.getKey().equals(sbest) && difference) {
                         Output = Output + "\n" + (String) entrySet.getKey() + "& \\cellcolor{gray95} {\\bf "
-                                + String.format("%g", Rj[i]) + "(" + String.format("%g", std[i]) + ")}\\\\\\hline";
+                                + String.format("%.3g", Rj[i]) + "(" + String.format("%.3g", std[i]) + ")}\\\\\\hline";
                     } else if (entrySet.getKey().equals(sbest)) {
-                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + String.format("%g", Rj[i]) + "("
-                                + String.format("%g", std[i]) + ")}\\\\\\hline";
+                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + String.format("%.3g", Rj[i]) + "("
+                                + String.format("%.3g", std[i]) + ")}\\\\\\hline";
                     } else {
-                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + String.format("%g", Rj[i]) + "("
-                                + String.format("%g", std[i]) + ")\\\\\\hline";
+                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + String.format("%.3g", Rj[i]) + "("
+                                + String.format("%.3g", std[i]) + ")\\\\\\hline";
                     }
                     i++;
                 }
@@ -411,11 +411,11 @@ public class StatisticalTests {
                     // for (i=0; i<matrix.size();i++) {
                     if (entrySet.getKey().equals(sbest) && difference) {
                         Output = Output + "\n" + (String) entrySet.getKey() + "& \\cellcolor{gray95} {\\bf "
-                                + String.format("%g", Rj[i]) + "}\\\\\\hline";
+                                + String.format("%.3g", Rj[i]) + "}\\\\\\hline";
                     } else if (entrySet.getKey().equals(sbest)) {
-                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + String.format("%g", Rj[i]) + "}\\\\\\hline";
+                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + String.format("%.3g", Rj[i]) + "}\\\\\\hline";
                     } else {
-                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + String.format("%g", Rj[i]) + "\\\\\\hline";
+                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + String.format("%.3g", Rj[i]) + "\\\\\\hline";
                     }
                     i++;
                 }
