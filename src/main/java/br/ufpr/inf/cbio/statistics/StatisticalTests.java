@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -162,6 +164,7 @@ public class StatisticalTests {
         });
 
         FileWriter os, osbin;
+        NumberFormat formatter = new DecimalFormat("0.##E0");
 
         for (String i : indicatorNameList) {
             try {
@@ -180,20 +183,20 @@ public class StatisticalTests {
 
                         if (printSTD) {
                             if (bold.get(i).get(p).equals(a)) {
-                                os.write(" {\\bf " + String.format("%.3g", mean.get(i).get(p).get(a)) + "("
-                                        + String.format("%.3g", standardDeviation.get(i).get(p).get(a)) + ")}");
+                                os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "("
+                                        + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")}");
                                 osbin.write(" 1");
                             } else {
-                                os.write(" " + String.format("%.3g", mean.get(i).get(p).get(a)) + "("
-                                        + String.format("%.3g", standardDeviation.get(i).get(p).get(a)) + ")");
+                                os.write(" " + formatter.format(mean.get(i).get(p).get(a)) + "("
+                                        + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")");
                                 osbin.write(" 0");
                             }
                         } else {
                             if (bold.get(i).get(p).equals(a)) {
-                                os.write(" {\\bf " + String.format("%.3g", mean.get(i).get(p).get(a)) + "}");
+                                os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "}");
                                 osbin.write(" 1");
                             } else {
-                                os.write(" " + String.format("%.3g", mean.get(i).get(p).get(a)));
+                                os.write(" " + formatter.format(mean.get(i).get(p).get(a)));
                                 osbin.write(" 0");
                             }
                         }
@@ -364,7 +367,7 @@ public class StatisticalTests {
                     break;
                 }
             }
-
+            NumberFormat formatter = new DecimalFormat("0.000");
             String Output = "";
             Output = Output + ("\\documentclass{article}\n" + "\\usepackage{graphicx}"
                     + "\\usepackage{colortbl}\n"
@@ -396,13 +399,13 @@ public class StatisticalTests {
                     // for (i=0; i<matrix.size();i++) {
                     if (entrySet.getKey().equals(sbest) && difference) {
                         Output = Output + "\n" + (String) entrySet.getKey() + "& \\cellcolor{gray95} {\\bf "
-                                + String.format("%.3g", Rj[i]) + "(" + String.format("%.3g", std[i]) + ")}\\\\\\hline";
+                                + formatter.format(Rj[i]) + "(" + formatter.format(std[i]) + ")}\\\\\\hline";
                     } else if (entrySet.getKey().equals(sbest)) {
-                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + String.format("%.3g", Rj[i]) + "("
-                                + String.format("%.3g", std[i]) + ")}\\\\\\hline";
+                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + formatter.format(Rj[i]) + "("
+                                + formatter.format(std[i]) + ")}\\\\\\hline";
                     } else {
-                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + String.format("%.3g", Rj[i]) + "("
-                                + String.format("%.3g", std[i]) + ")\\\\\\hline";
+                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + formatter.format(Rj[i]) + "("
+                                + formatter.format(std[i]) + ")\\\\\\hline";
                     }
                     i++;
                 }
@@ -411,11 +414,11 @@ public class StatisticalTests {
                     // for (i=0; i<matrix.size();i++) {
                     if (entrySet.getKey().equals(sbest) && difference) {
                         Output = Output + "\n" + (String) entrySet.getKey() + "& \\cellcolor{gray95} {\\bf "
-                                + String.format("%.3g", Rj[i]) + "}\\\\\\hline";
+                                + formatter.format(Rj[i]) + "}\\\\\\hline";
                     } else if (entrySet.getKey().equals(sbest)) {
-                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + String.format("%.3g", Rj[i]) + "}\\\\\\hline";
+                        Output = Output + "\n" + (String) entrySet.getKey() + "& {\\bf " + formatter.format(Rj[i]) + "}\\\\\\hline";
                     } else {
-                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + String.format("%.3g", Rj[i]) + "\\\\\\hline";
+                        Output = Output + "\n" + (String) entrySet.getKey() + "&" + formatter.format(Rj[i]) + "\\\\\\hline";
                     }
                     i++;
                 }
