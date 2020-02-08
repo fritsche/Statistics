@@ -164,7 +164,7 @@ public class StatisticalTests {
         });
 
         FileWriter os, osbin;
-        NumberFormat formatter = new DecimalFormat("0.##E0");
+        NumberFormat formatter = new DecimalFormat("0.00E0");
 
         for (String i : indicatorNameList) {
             try {
@@ -183,20 +183,20 @@ public class StatisticalTests {
 
                         if (printSTD) {
                             if (bold.get(i).get(p).equals(a)) {
-                                os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "("
+                                os.write("{\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "("
                                         + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")}");
                                 osbin.write(" 1");
                             } else {
-                                os.write(" " + formatter.format(mean.get(i).get(p).get(a)) + "("
+                                os.write("" + formatter.format(mean.get(i).get(p).get(a)) + "("
                                         + formatter.format(standardDeviation.get(i).get(p).get(a)) + ")");
                                 osbin.write(" 0");
                             }
                         } else {
                             if (bold.get(i).get(p).equals(a)) {
-                                os.write(" {\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "}");
+                                os.write("{\\bf " + formatter.format(mean.get(i).get(p).get(a)) + "}");
                                 osbin.write(" 1");
                             } else {
-                                os.write(" " + formatter.format(mean.get(i).get(p).get(a)));
+                                os.write("" + formatter.format(mean.get(i).get(p).get(a)));
                                 osbin.write(" 0");
                             }
                         }
